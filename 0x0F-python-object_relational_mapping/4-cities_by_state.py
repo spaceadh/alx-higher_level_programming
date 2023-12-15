@@ -1,35 +1,37 @@
 #!/usr/bin/python3
-"""Display cities"""
+"""
+This script lists all cities from
+the database `hbtn_0e_4_usa`.
+"""
+
 import MySQLdb
-import sys
+from sys import argv
 
-
-def list_cities():
-    """Takes arguments argv to list from database
-    Only lists with states that matches name argument
-
-    Arguments:
-        argv[1]: mysql username
-        argv[2]: mysql password
-        argv[3]: database name
+if __name__ == '__main__':
     """
-    db = MySQLdb.connect(host="localhost",
-                         port=3306,
-                         user=sys.argv[1],
-                         passwd=sys.argv[2],
-                         db=sys.argv[3])
+    Access to the database and get the cities
+    from the database.
+    """
 
-    cur = db.cursor()
+    db = MySQLdb.connect(host="localhost", user=argv[1], port=3306,
+                         passwd=argv[2], db=argv[3])
 
-    cur.execute("SELECT cities.id, cities.name, states.name FROM cities\
-                JOIN states ON cities.state_id = states.id\
-                ORDER BY cities.id ASC")
-    rows = cur.fetchall()
-    for i in rows:
-        print(i)
+    with db.cursor() as cur:
+        cur.execute("""
+            SELECT
+                cities.id, cities.name, states.name
+            FROM
+                cities
+            JOIN
+                states
+            ON
+                cities.state_id = states.id
+            ORDER BY
+                cities.id ASC
+        """)
 
-    cur.close()
-    db.close()
+        rows = cur.fetchall()
 
-if __name__ == "__main__":
-    list_cities()
+    if rows is not None:
+        for row in rows:
+            print(row)
